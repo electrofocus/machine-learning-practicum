@@ -131,3 +131,7 @@ dmypy.json
 # Project settings
 .idea
 .vscode
+
+#practicum folders
+.competition_data
+.pandas_data
