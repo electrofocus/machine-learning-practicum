@@ -60,40 +60,32 @@ def train(inputs_list, w1, w2, w3, targets_list, lr, error):
     global_error = 1
     # список ошибок
     list_error = []
-    #   Главный цикл обучения, повторяется пока глобальная ошибка больше погрешности
+    # Главный цикл обучения, повторяется пока глобальная ошибка больше погрешности
     while global_error > error:
         # локальная ошибка
         local_error = np.array([])
+
         # побочный цикл, прогоняющий данные с input_list
-        # функция enumerate(matrix) возвращает индекс и значение строк
-        # которая сохраняется в переменные i, value
-        # i - индекс строки input_list
-        # value - переменная которая хранит в себе строки матрицы input_list
         for i, inputs in enumerate(inputs_list):
-            # переводит листа inputs в двумерный вид (для возможности проведения операции транспонирования)
+            # переводит inputs в двумерный вид (для возможности проведения операции транспонирования)
             inputs = np.array(inputs, ndmin=2)
             # targets - содержит локальный таргет для данного инпута
             targets = np.array(targets_list[i], ndmin=2)
 
             # прямое распространение
-            # скалярное произведение строки на матрицу весов
-            hidden_in = np.dot(inputs, w1)
-            # применение активационной функции к вектору
-            hidden_out = f(hidden_in)
-            # добавление в начало вектора мнимой единицы для обучения сети
-            hidden_out = np.array(np.insert(hidden_out, 0, [1]), ndmin=2)
 
-            # скалярное произведение строки на матрицу весов
-            hidden_in2 = np.dot(hidden_out, w2)
-            # применение активационной функции к вектору
-            hidden_out2 = f(hidden_in2)
-            # добавление в начало вектора мнимой единицы
-            hidden_out2 = np.array(np.insert(hidden_out2, 0, [1]), ndmin=2)
+            hidden_in = np.dot(inputs, w1)  # скалярное произведение строки на матрицу весов
+            hidden_out = f(hidden_in)  # применение активационной функции к вектору
+            hidden_out = np.array(np.insert(hidden_out, 0, [1]), ndmin=2)  # добавление в начало вектора единицы
 
-            # скалярное произведение строки на матрицу весов
-            final_in = np.dot(hidden_out2, w3)
+            hidden_in2 = np.dot(hidden_out, w2)  # скалярное произведение строки на матрицу весов
+            hidden_out2 = f(hidden_in2)  # применение активационной функции к вектору
+            hidden_out2 = np.array(np.insert(hidden_out2, 0, [1]), ndmin=2)  # добавление в начало вектора единицы
+
+            final_in = np.dot(hidden_out2, w3)  # скалярное произведение строки на матрицу весов
+
             # активационная функция выходного слоя это прямая y = x, поэтому
-            # здесь значение "out" равно значение "in"
+            # здесь значение "out" равно значению "in"
             final_out = final_in
 
             # вычисление ошибки выходного слоя
@@ -104,7 +96,8 @@ def train(inputs_list, w1, w2, w3, targets_list, lr, error):
             hidden_error = np.dot(hidden_error2[:, 1:], w2.T)
             # добавление в список локальных ошибок текущую ошибку
             local_error = np.append(local_error, output_error)
-            # обратного распространение ошибки
+
+            # обратное распространение ошибки
             # изменение матрицы весов 3 т.к. производная активационный функции (y = x)
             # y` = 1 в dW = lr*output_error*hidden_out2.T не умножается на эту производную
             w3 += lr * output_error * hidden_out2.T
@@ -112,17 +105,20 @@ def train(inputs_list, w1, w2, w3, targets_list, lr, error):
             # hidden_error2[:,1:] - означает весь вектор за исключением первого элемента
             w2 += lr * hidden_error2[:, 1:] * f1(hidden_out2[:, 1:]) * hidden_out.T
             w1 += lr * hidden_error[:, 1:] * f1(hidden_out[:, 1:]) * inputs.T
+
         # глобальная ошибка - это средняя по модуля от всех локальных ошибок
         global_error = abs(np.mean(local_error))
         # global_error = np.sqrt(((local_error) ** 2).mean())
         # эпоха увеличивается на 1
         era += 1
         # вывод в консоль текущую глобальную ошибку
-        print('era=', era, 'global_error=', global_error)
+        # print('era:', era, 'global_error:', global_error)
         # в список ошибок добавляется глобальная ошибка
         list_error.append(global_error)
+
         # если при обучении количество эпох превысит порог 10000 то обучение прекратится
-        if era > 10000: break
+        if era > 30000:
+            break
 
     return w1, w2, w3, era, list_error
 
@@ -167,13 +163,13 @@ test = data[600:714]
 test = np.c_[np.ones(114), test]
 targets_test = target_data[600:714]
 
-lr = 0.5  # скорость обучения
+lr = 0.001  # скорость обучения
 eps = 10 ** (-8)  # допустимая погрешность обучения
 
 # количество узлов в входном слое с учетом единички, т.е. кол-во столбцов датасета + единичка
 input_layer = 7
 # количество узлов в скрытом слое 1
-hidden_layer = 9
+hidden_layer = 5
 # количество узлов в скрытом слое 2
 hidden_layer2 = 4
 # количество узлов в выходном слое
@@ -197,11 +193,13 @@ eq = sum(result_test == targets_test) / len(test)
 # вывод точности
 print("Результат тестирования (в %) = " + str(eq * 100))
 
+print('Ошибка обучения:', lst[-1])
+
 # отрисовка побочных графиков
 # plt.plot(np.arange(114),result_test,color='r')
 # plt.plot(np.arange(114),targets_test,color='b')
 
 # отрисовка графика кривой ошибки
-fig = plt.figure(figsize=(20, 20))
+fig = plt.figure(figsize=(5, 5))
 plt.plot(np.arange(era), lst)
 plt.show()
