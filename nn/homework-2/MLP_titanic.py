@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-import scipy.special as sp
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+import scipy.special as sp
 
 
 def f(x):
@@ -54,12 +54,11 @@ def train(inputs_list, w1, w2, w3, targets_list, lr, error):
 
     :return:             измененные веса, количество эпох, список ошибок
     """
-    # счетчик эпох
-    era = 0
-    # глобальная ошибка
-    global_error = 1
-    # список ошибок
-    list_error = []
+
+    era = 0  # счетчик эпох
+    global_error = 1  # глобальная ошибка
+    list_error = []  # список ошибок
+
     # Главный цикл обучения, повторяется пока глобальная ошибка больше погрешности
     while global_error > error:
         # локальная ошибка
@@ -108,16 +107,16 @@ def train(inputs_list, w1, w2, w3, targets_list, lr, error):
 
         # глобальная ошибка - это средняя по модуля от всех локальных ошибок
         global_error = abs(np.mean(local_error))
-        # global_error = np.sqrt(((local_error) ** 2).mean())
+        # global_error = np.sqrt((local_error ** 2).mean())
         # эпоха увеличивается на 1
         era += 1
         # вывод в консоль текущую глобальную ошибку
-        # print('era:', era, 'global_error:', global_error)
+        print('era:', era, 'global_error:', global_error)
         # в список ошибок добавляется глобальная ошибка
         list_error.append(global_error)
 
         # если при обучении количество эпох превысит порог 10000 то обучение прекратится
-        if era > 30000:
+        if era > 10000:
             break
 
     return w1, w2, w3, era, list_error
@@ -163,13 +162,13 @@ test = data[600:714]
 test = np.c_[np.ones(114), test]
 targets_test = target_data[600:714]
 
-lr = 0.001  # скорость обучения
-eps = 10 ** (-8)  # допустимая погрешность обучения
+lr = 0.5  # скорость обучения
+eps = 10 ** (-9)  # допустимая погрешность обучения
 
 # количество узлов в входном слое с учетом единички, т.е. кол-во столбцов датасета + единичка
 input_layer = 7
 # количество узлов в скрытом слое 1
-hidden_layer = 5
+hidden_layer = 6
 # количество узлов в скрытом слое 2
 hidden_layer2 = 4
 # количество узлов в выходном слое
