@@ -111,7 +111,7 @@ def train(inputs_list, w1, w2, w3, targets_list, lr, error):
         # эпоха увеличивается на 1
         era += 1
         # вывод в консоль текущую глобальную ошибку
-        print('era:', era, 'global_error:', global_error)
+        # print('era:', era, 'global_error:', global_error)
         # в список ошибок добавляется глобальная ошибка
         list_error.append(global_error)
 
@@ -162,7 +162,7 @@ test = data[600:714]
 test = np.c_[np.ones(114), test]
 targets_test = target_data[600:714]
 
-lr = 0.5  # скорость обучения
+lr = 0.7  # скорость обучения
 eps = 10 ** (-9)  # допустимая погрешность обучения
 
 # количество узлов в входном слое с учетом единички, т.е. кол-во столбцов датасета + единичка
